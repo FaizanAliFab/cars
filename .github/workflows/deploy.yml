@@ -21,8 +21,11 @@ jobs:
       - name: Add EC2 to known hosts
         run: |
           mkdir -p ~/.ssh
-          ssh-keyscan -H 18.118.32.46 >> ~/.ssh/known_hosts
+          ssh-keyscan -H 18.118.32.46 >> ~/.ssh/known_hosts  # Replace with your actual EC2 public IP
 
       - name: Deploy to EC2
         run: |
-          rsync -avz --delete ./ ubuntu@18.118.32.46:/var/www/html
+          # First, sync to a temporary directory
+          rsync -avz --delete ./ ubuntu@18.118.32.46:/tmp/website
+          # Then, copy to the final location using sudo
+          ssh ubuntu@18.118.32.46 "sudo rsync -avz --delete /tmp/website/ /var/www/html/"
